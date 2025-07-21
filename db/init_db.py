@@ -16,7 +16,7 @@ with sqlite3.connect(DB_NAME) as connect:
     )
     cursor.execute(
         """
-        CREATE TABLE IF NOT EXISTS posts (
+        CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
             username TEXT NOT NULL,
             hashed_password TEXT NOT NULL,
