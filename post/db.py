@@ -1,13 +1,8 @@
 import sqlite3
 from datetime import datetime
-from .constants import DB_NAME
 from pydantic import BaseModel
-
-
-class Post(BaseModel):
-    title: str
-    description: str | None = None
-    content: str
+from config import DB_NAME
+from .models import Post
 
 
 def write_post(post: Post):

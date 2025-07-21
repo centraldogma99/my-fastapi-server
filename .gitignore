@@ -5,6 +5,9 @@ build/
 dist/
 wheels/
 *.egg-info
+.env
+.DS_Store
+*.db
 
 # Virtual environments
 .venv

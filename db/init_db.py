@@ -1,5 +1,5 @@
 import sqlite3
-from constants import DB_NAME
+from config import DB_NAME
 
 with sqlite3.connect(DB_NAME) as connect:
     cursor = connect.cursor()
@@ -11,6 +11,16 @@ with sqlite3.connect(DB_NAME) as connect:
             title TEXT NOT NULL,
             description TEXT,
             content TEXT NOT NULL
+        )
+    """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS posts (
+            id INTEGER PRIMARY KEY,
+            username TEXT NOT NULL,
+            hashed_password TEXT NOT NULL,
+            disabled BOOLEAN NOT NULL DEFAULT 0,
         )
     """
     )

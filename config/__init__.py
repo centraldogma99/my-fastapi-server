@@ -1,0 +1,1 @@
+from .settings import ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, DB_NAME
