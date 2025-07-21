@@ -9,22 +9,43 @@ from typing import Annotated
 from .models import User, UserInDB
 import os
 from dotenv import load_dotenv
+import sqlite3
+from .models import UserToCreate
+from config import DB_NAME
+
+
+def get_user_by_username(username: str):
+    with sqlite3.connect(DB_NAME) as connect:
+        connect.row_factory = sqlite3.Row
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+        return cursor.fetchone()
+
+
+def create_user(user: UserToCreate):
+    with sqlite3.connect(DB_NAME) as connect:
+        cursor = connect.cursor()
+        cursor.execute(
+            "INSERT INTO users (username, hashed_password) VALUES (?, ?)",
+            (user.username, get_password_hash(user.plain_password)),
+        )
+        connect.commit()
+        return cursor.lastrowid
+
+
+def remove_user(username: str):
+    with sqlite3.connect(DB_NAME) as connect:
+        cursor = connect.cursor()
+        cursor.execute("DELETE FROM users WHERE username = ?", (username,))
+        connect.commit()
+        return cursor.lastrowid
+
 
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    }
-}
 
 
 def verify_password(plain_password: str, hashed_password: str):
@@ -35,19 +56,19 @@ def get_password_hash(password: str):
     return pwd_context.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+def get_user(username: str):
+    user = get_user_by_username(username)
+    if user:
+        return UserInDB(**user)
 
 
-def authenticate_user(db, username: str, password: str):
-    user = get_user(db, username)
-    if not user:
+def authenticate_user(username: str, password: str):
+    userFromDB = get_user(username)
+    if not userFromDB:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, userFromDB.hashed_password):
         return False
-    return user
+    return userFromDB
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -76,7 +97,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             raise credentials_exception
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user(fake_users_db, username)
+    user = get_user(username)
     if user is None:
         raise credentials_exception
     return user
