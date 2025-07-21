@@ -13,10 +13,7 @@ class Post(BaseModel):
 def write_post(post: Post):
     with sqlite3.connect(DB_NAME) as connect:
         cursor = connect.cursor()
-
-        # 현재 시간을 ISO 8601 형식으로 가져오기
         current_time = datetime.now().isoformat()
-
         cursor.execute(
             """
         INSERT INTO posts (title, description, content, created_date)
@@ -28,19 +25,22 @@ def write_post(post: Post):
             ),
         )
         connect.commit()
+        return cursor.lastrowid
 
 
 def get_all_posts():
     with sqlite3.connect(DB_NAME) as connect:
+        connect.row_factory = sqlite3.Row
         cursor = connect.cursor()
-        cursor.execute("SELECT * FROM posts")
+        cursor.execute("SELECT * FROM posts ORDER BY id DESC")
         return cursor.fetchall()
 
 
 def get_post_by_id(post_id: int):
     with sqlite3.connect(DB_NAME) as connect:
+        connect.row_factory = sqlite3.Row
         cursor = connect.cursor()
-        cursor.execute("SELECCT * FROM posts WHERE id = ?", (post_id,))
+        cursor.execute("SELECT * FROM posts WHERE id = ?", (post_id,))
         return cursor.fetchone()
 
 
