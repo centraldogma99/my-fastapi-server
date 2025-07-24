@@ -7,6 +7,7 @@ from .models import Token, User, UserToCreate
 from .security import (
     authenticate_user,
     create_access_token,
+    get_current_active_admin_user,
     get_current_active_user,
     get_user_by_username as get_user_by_username_db,
     create_user as create_user_db,
@@ -46,7 +47,7 @@ async def get_user_by_id(
     username: str,
     _: Annotated[
         User,
-        Depends(get_current_active_user),
+        Depends(get_current_active_admin_user),
     ],
 ):
     return get_user_by_username_db(username)
@@ -54,13 +55,13 @@ async def get_user_by_id(
 
 @router.put("/users")
 async def create_user(
-    user: UserToCreate, _: Annotated[User, Depends(get_current_active_user)]
+    user: UserToCreate, _: Annotated[User, Depends(get_current_active_admin_user)]
 ):
     return create_user_db(user)
 
 
 @router.delete("/users/{username}")
 async def delete_user(
-    username: str, _: Annotated[User, Depends(get_current_active_user)]
+    username: str, _: Annotated[User, Depends(get_current_active_admin_user)]
 ):
     return remove_user_db(username)

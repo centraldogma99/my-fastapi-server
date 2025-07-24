@@ -1,4 +1,7 @@
+import os
 import sqlite3
+
+from auth.security import get_password_hash
 from config import DB_NAME
 
 
@@ -21,9 +24,15 @@ def init_db():
             CREATE TABLE IF NOT EXISTS users (
                 username TEXT NOT NULL PRIMARY KEY,
                 hashed_password TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'user',
                 disabled BOOLEAN NOT NULL DEFAULT 0
             )
         """
         )
-        cursor.execute("SELECT name FROM sqlite_master")
-        print(cursor.fetchall())
+        hashed_password = get_password_hash(os.getenv("ADMIN_PASSWORD"))
+        print(hashed_password)
+        cursor.execute(
+            "INSERT INTO users (username, hashed_password, role, disabled) VALUES ('admin', ?, 'admin', 0)",
+            (hashed_password,),
+        )
+        connect.commit()

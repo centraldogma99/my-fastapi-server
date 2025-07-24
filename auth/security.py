@@ -6,7 +6,7 @@ from config import ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 import jwt
 from fastapi import Depends, HTTPException, status
 from typing import Annotated
-from .models import User, UserInDB
+from .models import User, UserInDB, UserRole
 import os
 from dotenv import load_dotenv
 import sqlite3
@@ -108,4 +108,14 @@ async def get_current_active_user(
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+async def get_current_active_admin_user(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="관리자 권한이 없습니다."
+        )
     return current_user
