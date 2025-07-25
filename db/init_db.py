@@ -30,7 +30,7 @@ def init_db():
         """
         )
         hashed_password = get_password_hash(os.getenv("ADMIN_PASSWORD"))
-        print(hashed_password)
+
         cursor.execute(
             "INSERT INTO users (username, hashed_password, role, disabled) VALUES ('admin', ?, 'admin', 0)",
             (hashed_password,),

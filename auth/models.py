@@ -20,7 +20,6 @@ class UserInDB(User):
 class UserToCreate(BaseModel):
     username: str
     plain_password: str
-    role: UserRole = UserRole.USER  # 기본값: 일반 사용자
 
 
 class Token(BaseModel):

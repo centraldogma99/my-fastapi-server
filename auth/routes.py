@@ -54,14 +54,12 @@ async def get_user_by_id(
 
 
 @router.put("/users")
-async def create_user(
-    user: UserToCreate, _: Annotated[User, Depends(get_current_active_admin_user)]
-):
+async def create_user(user: UserToCreate):
     return create_user_db(user)
 
 
-@router.delete("/users/{username}")
-async def delete_user(
-    username: str, _: Annotated[User, Depends(get_current_active_admin_user)]
+@router.post("/users/unregister")
+async def unregister_user(
+    current_user: Annotated[User, Depends(get_current_active_user)]
 ):
-    return remove_user_db(username)
+    return remove_user_db(current_user.username)
