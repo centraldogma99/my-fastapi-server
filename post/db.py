@@ -11,8 +11,8 @@ def write_post(post: Post):
         current_time = datetime.now().isoformat()
         cursor.execute(
             """
-        INSERT INTO posts (title, description, content, created_date)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO posts (slug, contents, created_date)
+        VALUES (?, ?, ?)
         """,
             (
                 *post.model_dump().values(),

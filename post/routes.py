@@ -1,6 +1,12 @@
 from fastapi import APIRouter
 
-from .db import Post, get_all_posts, remove_post, write_post
+from .db import (
+    Post,
+    get_all_posts,
+    get_post_by_id as get_post_from_db,
+    remove_post,
+    write_post,
+)
 
 
 router = APIRouter(
@@ -15,7 +21,12 @@ async def get_posts():
 
 @router.get("/{post_id}")
 async def get_post_by_id(post_id: int):
-    return get_post_by_id(post_id)
+    post = get_post_from_db(post_id)
+    if post is None:
+        from fastapi import HTTPException
+
+        raise HTTPException(status_code=404, detail="포스트를 찾을 수 없습니다.")
+    return post
 
 
 @router.post("/")
