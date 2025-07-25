@@ -19,20 +19,20 @@ def init_db():
             )
         """
         )
-        # cursor.execute(
-        #     """
-        #     CREATE TABLE IF NOT EXISTS users (
-        #         username TEXT NOT NULL PRIMARY KEY,
-        #         hashed_password TEXT NOT NULL,
-        #         role TEXT NOT NULL DEFAULT 'user',
-        #         disabled BOOLEAN NOT NULL DEFAULT 0
-        #     )
-        # """
-        # )
-        # hashed_password = get_password_hash(os.getenv("ADMIN_PASSWORD"))
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                username TEXT NOT NULL PRIMARY KEY,
+                hashed_password TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'user',
+                disabled BOOLEAN NOT NULL DEFAULT 0
+            )
+        """
+        )
+        hashed_password = get_password_hash(os.getenv("ADMIN_PASSWORD"))
 
-        # cursor.execute(
-        #     "INSERT INTO users (username, hashed_password, role, disabled) VALUES ('admin', ?, 'admin', 0)",
-        #     (hashed_password,),
-        # )
+        cursor.execute(
+            "INSERT OR IGNORE INTO users (username, hashed_password, role, disabled) VALUES ('admin', ?, 'admin', 0)",
+            (hashed_password,),
+        )
         connect.commit()
